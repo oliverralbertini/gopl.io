@@ -1,11 +1,3 @@
-// Copyright © 2016 Alan A. A. Donovan & Brian W. Kernighan.
-// License: https://creativecommons.org/licenses/by-nc-sa/4.0/
-
-// See page 10.
-//!+
-
-// Dup2 prints the count and text of lines that appear more than once
-// in the input.  It reads from stdin or from a list of named files.
 package main
 
 import (
@@ -18,7 +10,7 @@ import (
 
 type fileCount struct {
 	count int
-	files string
+	files []string
 }
 
 func findDupes(w io.Writer) {
@@ -39,30 +31,34 @@ func findDupes(w io.Writer) {
 	}
 	for line, fc := range counts {
 		if fc.count > 1 {
-			fc.files = strings.TrimSuffix(fc.files, ", ")
-			fmt.Fprintf(w, "%s:\t%d\t%s\n", fc.files, fc.count, line)
+			fmt.Fprintf(w, "%s:\t%d\t%s\n", strings.Join(fc.files, ", "), fc.count, line)
 		}
 	}
-}
-
-func main() {
-	findDupes(os.Stdout)
 }
 
 func countLines(f *os.File, counts map[string]*fileCount) {
 	input := bufio.NewScanner(f)
 	for input.Scan() {
+		if counts[input.Text()] == nil {
+			counts[input.Text()] = &fileCount{0, make([]string, 0)}
+		}
 		fc := counts[input.Text()]
-		if fc == nil {
-			fc = &fileCount{0, ""}
-		}
 		fc.count++
-		if !strings.Contains(fc.files, f.Name()) {
-			fc.files += f.Name() + ", "
+		if !contains(fc.files, f.Name()) {
+			fc.files = append(fc.files, f.Name())
 		}
-		counts[input.Text()] = fc
 	}
-	// NOTE: ignoring potential errors from input.Err()
 }
 
-//!-
+func contains(strs []string, str string) bool {
+	for _, s := range strs {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+func main() {
+	findDupes(os.Stdout)
+}

@@ -14,8 +14,8 @@ func TestFindDupes(t *testing.T) {
 	os.Args = []string{"", "fixtures/12.txt", "fixtures/23.txt"}
 
 	want := []string{
-		fmt.Sprintf("fixtures/12.txt:\t2\tone"),
-		fmt.Sprintf("fixtures/12.txt, fixtures/23.txt:\t2\ttwo"),
+		fmt.Sprintf("fixtures/12.txt:\t2\tone\n"),
+		fmt.Sprintf("fixtures/12.txt, fixtures/23.txt:\t2\ttwo\n"),
 		fmt.Sprintf("fixtures/23.txt:\t2\tthree\n")}
 
 	var buffer bytes.Buffer
